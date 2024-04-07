@@ -235,9 +235,86 @@ Gradient of Loss w.r.t w1: [[0.38096682 0.38096682 0.38096682 0.38096682]
         w1_torch.grad.zero_()
         w2_torch.grad.zero_()
    ```
+   - update with learning rate(0.01) * gradient with respect to each weight matrices
    - initialize the gradient to zero for next iteration
-   - 
+   - set torch.no_grad() since we don't train at updating step 
+   
+   
+2. Numpy
+   Update Neural Net np Class
+   ```
+   class Neural_Net_np:
+    def __init__(self):
+        self.w1 = np.array([[0.1, 0.2, 0.3, 0.4],
+               [0.5, 0.6, 0.7, 0.8],
+               [0.9, 1.0, 1.1, 1.2]])
+        self.w2 = np.array([[0.2, 0.3],
+               [0.4, 0.5],
+               [0.6, 0.7],
+               [0.8, 0.9]])
 
+    def ReLU(self, z):
+        return np.maximum(0, z)
+
+    def ReLU_derivative(self, x):
+        return (x > 0).astype(float)
+
+    def softmax(self, z):
+        exp_z = np.exp(z - np.max(z, axis=1, keepdims=True))
+        return exp_z / np.sum(exp_z, axis=1, keepdims=True)
+
+    def forward(self, x):
+        self.z1 = x.dot(self.w1)
+        self.a1 = self.ReLU(self.z1)
+        self.z2 = self.a1.dot(self.w2)
+        self.a2 = self.softmax(self.z2)
+        return self.a2
+
+    def cross_entropy_loss(self, y_pred, y):
+        return -1 * np.sum(y * np.log(y_pred))
+
+
+    def backward(self, x, y):
+        # Gradient of the loss with respect to softmax input
+        self.dL_dz2 = self.output - y
+        self.dL_dw2 = self.a1.T.dot(self.dL_dz2)
+        self.dL_da1 = self.dL_dz2.dot(self.w2.T)
+        self.dL_dz1 = self.dL_da1 * self.ReLU_derivative(self.z1)
+        self.dL_dw1 = x.T.dot(self.dL_dz1)
+        return self.dL_dw1, self.dL_dw2
+
+
+    def dropout(self, a1, rate=0.4):
+        # Generate a mask to drop out neurons
+        mask = np.random.binomial(1, 1-rate, size = a1.shape)
+        return a1 * mask
+
+
+    def forward_with_dropout(self, x):
+        self.z1 = x.dot(self.w1)
+        self.a1 = self.ReLU(self.z1)
+        self.a1_dropout = self.dropout(self.a1)
+        self.z2 = self.a1_dropout.dot(self.w2)
+        self.output = self.softmax(self.z2)
+        return self.output
+
+    def update_weight(self, grad_w1, grad_w2, lr=0.01):
+        self.w1 -= lr * grad_w1
+        self.w2 -= lr * grad_w2
+   ```
+   - Added dropout, forward with dropout, update weight function.
+  
+     
+     - Dropout function
+       ```
+        def dropout(self, a1, rate=0.4):
+        # Generate a mask to drop out neurons
+        mask = np.random.binomial(1, 1-rate, size = a1.shape)
+        return a1 * mask
+       ```
+       
+   
+   
    
    
  
