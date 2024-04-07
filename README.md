@@ -160,8 +160,87 @@ Gradient of Loss w.r.t w1: [[0.38096682 0.38096682 0.38096682 0.38096682]
         dL_dw1 = x.T.dot(dL_dz1)
         return dL_dw1
    ```
+   - Includes forward pass(from task 1), backpropagation(names as backward), ReLU & Softmax(from task 1), ReLU derivative, weights, and cross entropy loss.
+   - ReLU derivative function is for backpropagation using chain rule.
+  
+   Calculate gradient with numpy
+   ```
+   model = Neural_Net_np()
+   x = np.array([[1.0,2.0,3.0],[4.0,5.0,6.0]])
+   output = model.forward(x)
+   y = np.array([[0,1], [1,0]])
+   loss = model.cross_entropy_loss(output, y)
+   grad_w1 = model.backward(x, y)
+
+   print("Gradient of Loss w.r.t w1:", grad_w1)
+   ```
+   - First, make model using Neural Net np class.
+   - Get the output from model.forward()
+   - Calculate the loss with y value and the output
+   - Backward pass the loss and get the gradient value
+
+
+## Task 3
+1. Output for Pytorch
+   ```
+   print(w1_torch)
+   print(w2_torch)
+   tensor([[0.0439, 0.1263, 0.2244, 0.2644],
+        [0.3837, 0.4680, 0.5300, 0.6191],
+        [0.7234, 0.8097, 0.8356, 0.9737]], requires_grad=True)
+   tensor([[0.2463, 0.2537],
+        [0.4748, 0.4252],
+        [0.6806, 0.6194],
+        [0.7864, 0.9136]], requires_grad=True)
+   ```
+2. Output for Numpy
+   ```
+   print(model.w1)
+   print(model.w2)
+
+   [[0.05097084 0.18139549 0.31182013 0.44224478]
+    [0.46426742 0.57000749 0.67574755 0.78148762]
+    [0.87756399 0.95861948 1.03967497 1.12073046]]
+   [[0.18933791 0.31066209]
+    [0.44997597 0.45002403]
+    [0.71061402 0.58938598]
+    [0.97125207 0.72874793]]
+   ```
+---
+### Implementation explanation
+1. Pytorch
+
+   Forward pass with dropoout(0.4)
+   ```
+    z1_torch = torch.matmul(x_torch, w1_torch)
+    a1_torch = F.dropout(F.relu(z1_torch), p=0.4, training=True) #relu in inside the dropout
+    z2_torch = torch.matmul(a1_torch, w2_torch)
+    output = F.softmax(z2_torch)
+   ```
+   - forward pass with matrix multiplication
+   - After ReLU activation, randomly dropout the result by using F.dropout
+   - After dropping out, pass it through weight 2 and softmax
+
+   Calculate the loss & backpropagate
+   ```
+   loss = cross_entropy_loss(output, y_torch)
+   loss.backward()
+   ```
+   Update the weights using learning rate and gradient of the loss with respect to w1, and w2
+   ```
+    with torch.no_grad():
+        w1_torch -= learning_rate * w1_torch.grad
+        w2_torch -= learning_rate * w2_torch.grad
+
+        w1_torch.grad.zero_()
+        w2_torch.grad.zero_()
+   ```
+   - initialize the gradient to zero for next iteration
+   - 
+
    
    
+ 
    
    
    
