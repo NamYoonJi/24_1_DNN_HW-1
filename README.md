@@ -3,17 +3,13 @@
 1. Output for pytorch:
 ```
   PyTorch Neural Network Output:
-  
   output for x1: tensor([0.1324, 0.8676], grad_fn=<SelectBackward0>)
-  
   output for x2: tensor([0.0145, 0.9855], grad_fn=<SelectBackward0>)
   ```
 2. Output for numpy:
 ```  
   NumPy Neural Network Output:
-  
   output for x1: [0.13238887 0.86761113]
-  
   output for x2: [0.01448572 0.98551428]
   ```
 
@@ -22,13 +18,21 @@
 
 1. Pytorch
 
+  Importing packages
+  ```
+  import torch
+  import torch.nn.functional as F
+  ```
+   
+
    Given data & weights
    ```
-   x_torch = torch.tensor([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]]) #concat x1, x2 into one matrix
+   x_torch = torch.tensor([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]]) 
    w1_torch = torch.tensor([[0.1, 0.2, 0.3, 0.4], [0.5, 0.6, 0.7, 0.8], [0.9, 1.0, 1.1, 1.2]], requires_grad=True)
    w2_torch = torch.tensor([[0.2, 0.3], [0.4, 0.5], [0.6, 0.7], [0.8, 0.9]], requires_grad=True) 
    ```
-   - set w1_torch, w2_torch to require gradient in order to backpropagate
+   - concat x1, x2 into one tensor x_torch
+   - set w1_torch, w2_torch to require gradient in order to backpropagate & update
 
    Forward pass
    ```
@@ -37,12 +41,12 @@
    z2_torch = torch.matmul(a1_torch, w2_torch)
    output_torch = F.softmax(z2_torch, dim=1)
    ```
-   - Input x -> hidden layer w1 (with matrix multiplication)
-   - Activate through ReLU 
+   - Input x_torch -> hidden layer w1_torch (with matrix multiplication)
+   - Activate through ReLU (used built-in function from torch.nn.functional)
    - After activation, pass into w2  (with matrix multiplication)
-   - Activate through softmax
+   - Activate through softmax (used built-in function from torch.nn.functional)
   
-2. Numpy
+3. Numpy
 
    Given data & weights
    ```
@@ -51,7 +55,7 @@
    w2 = np.array([[0.2, 0.3], [0.4, 0.5], [0.6, 0.7], [0.8, 0.9]])
    ```
 
-   Defining functions required before forward pass
+   Defining functions required before forward pass with numpy
    ```
    def relu(x):
     return np.maximum(0, x)
@@ -60,6 +64,8 @@
      exp_x = np.exp(x - np.max(x))
      return exp_x / exp_x.sum(axis=0)
    ```
+   - ReLU: R(z)= z if z>=0, 0 otherwise
+   - Softmax: 
 
    Forward pass
    ```
@@ -241,6 +247,7 @@ Gradient of Loss w.r.t w1: [[0.38096682 0.38096682 0.38096682 0.38096682]
    
    
 2. Numpy
+   
    Update Neural Net np Class
    ```
    class Neural_Net_np:
@@ -303,16 +310,56 @@ Gradient of Loss w.r.t w1: [[0.38096682 0.38096682 0.38096682 0.38096682]
         self.w2 -= lr * grad_w2
    ```
    - Added dropout, forward with dropout, update weight function.
+   - Edited the backward function to get both derivation respect to w1 and w2
   
      
-     - Dropout function
-       ```
-        def dropout(self, a1, rate=0.4):
+     Dropout function
+     ```
+     def dropout(self, a1, rate=0.4):
         # Generate a mask to drop out neurons
         mask = np.random.binomial(1, 1-rate, size = a1.shape)
         return a1 * mask
        ```
-       
+       - Generate mask by numpy random to drop out neurons
+       - return masked value
+      
+         
+     Forward + Dropout
+     ```
+     def forward_with_dropout(self, x):
+        self.z1 = x.dot(self.w1)
+        self.a1 = self.ReLU(self.z1)
+        self.a1_dropout = self.dropout(self.a1)
+        self.z2 = self.a1_dropout.dot(self.w2)
+        self.output = self.softmax(self.z2)
+        return self.output
+     ```
+     - Added dropout layer after the first activation (ReLU)
+    
+     Update Weight Function
+     ```
+      def update_weight(self, grad_w1, grad_w2, lr=0.01):
+        self.w1 -= lr * grad_w1
+        self.w2 -= lr * grad_w2
+     ```
+     - get the gradient respect to w1 and w2, then multiply with learning rate(0.01)
+     - Next, subtract it from w1 and w2
+    
+    Run it through 100 epochs. 
+    ```
+    model = Neural_Net_np()
+    for epoch in range(100):
+      output = model.forward_with_dropout(x)
+      loss = model.cross_entropy_loss(output, y)
+      grad_w1, grad_w2 = model.backward(x, y)
+      model.update_weight(grad_w1, grad_w2, lr = 0.01)
+    ```
+   - Set iteration time = 100
+   - Gain output from dropout network, and calculate the loss with cross entropy loss
+   - Get each Gradient of w1 and w2 with backward process
+   - Update the weights(w1, w2) with gradients provided from the backward process
+     
+
    
    
    
