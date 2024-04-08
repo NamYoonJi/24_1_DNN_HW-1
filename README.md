@@ -55,7 +55,7 @@
    w2 = np.array([[0.2, 0.3], [0.4, 0.5], [0.6, 0.7], [0.8, 0.9]])
    ```
 
-   Defining functions required before forward pass with numpy
+   Defining activation functions required before forward pass with numpy
    ```
    def relu(x):
     return np.maximum(0, x)
@@ -65,7 +65,7 @@
      return exp_x / exp_x.sum(axis=0)
    ```
    - ReLU: R(z)= z if z>=0, 0 otherwise
-   - Softmax: 
+   - Softmax: e^(x-max(x)) / sum(e^(x-max(x)))
 
    Forward pass
    ```
@@ -74,6 +74,10 @@
    z2 = a1.dot(w2) # Hidden to output
    output = softmax(z2.T).T # Output activation
    ```
+   - Input x -> hidden layer w1 (with dot product)
+   - Activate through ReLU 
+   - After activation, pass into w2  (with dot product)
+   - Activate through softmax 
    - trasnposed z2 to calculate in column
    - transposed after the softmax to show in original form
 
@@ -87,7 +91,8 @@ tensor([[0.3810, 0.3810, 0.3810, 0.3810],
 ```
 2. Output for numpy
 ```
-Gradient of Loss w.r.t w1: [[0.38096682 0.38096682 0.38096682 0.38096682]
+Gradient of Loss with respect to w1:
+ [[0.38096682 0.38096682 0.38096682 0.38096682]
  [0.46627936 0.46627936 0.46627936 0.46627936]
  [0.5515919  0.5515919  0.5515919  0.5515919 ]]
 ```
