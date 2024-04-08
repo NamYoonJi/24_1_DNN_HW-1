@@ -46,7 +46,7 @@
    - After activation, pass into w2  (with matrix multiplication)
    - Activate through softmax (used built-in function from torch.nn.functional)
   
-3. Numpy
+2. Numpy
 
    Given data & weights
    ```
