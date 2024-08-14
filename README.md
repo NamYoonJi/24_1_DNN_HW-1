@@ -1,5 +1,16 @@
-# 24_1_DNN_HW-1
-## Task 1
+# 24_1_DNN_HW-1 Pytorch tutorial
+
+This homework assignment aims to implement a neural network using two popular packages:
+NumPy(>1.20) and PyTorch(>2.2.1). The implementation should be in Python and the resulting
+code should be submitted along with a detailed report that explains the implementation.
+
+
+## Task 1 
+
+Given a neural network architecture and a pair of inputs with weights, implement neural
+networks using NumPy and PyTorch.
+
+
 1. Output for pytorch:
 ```
   PyTorch Neural Network Output:
@@ -16,6 +27,12 @@
 ---
   
 ## Task 2
+
+Print out gradients of loss with respect to a specific weight from two neural networks. The neural
+networks are the ones you implemented in Task 1. The loss function is cross-entropy loss. We also note that cross-entropies here should be implemented by your hand. 
+
+Print the gradients of the loss function with respect to weight w1 for both neural networks, which are from both NumPy and PyTorch.
+
 1. Output for pytorch (gradient of w1)
 ```
 tensor([[0.3810, 0.3810, 0.3810, 0.3810],
@@ -32,6 +49,12 @@ Gradient of Loss with respect to w1:
 ---
 
 ## Task 3
+
+Please repeat the processes from Task 2 and update the w1 and w2 FOR 100 times (i.e., 100
+epochs), applying a dropout rate of 0.4. In your report, provide the updated w1 and w2 for both
+NumPy and PyTorch
+
+
 1. Output for Pytorch
    ```
    print(w1_torch)
